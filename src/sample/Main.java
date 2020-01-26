@@ -1,6 +1,7 @@
 package sample;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -10,10 +11,16 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("sign_in.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("FXML/sign_in.fxml"));
         primaryStage.setTitle("Webshop shoeline 1.0");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
+
+        primaryStage.setOnCloseRequest(closeRequest -> {
+            Platform.exit();
+            System.exit(0);
+        });
+
     }
 
 

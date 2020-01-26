@@ -1,26 +1,37 @@
-package sample;
+package sample.Controllers;
 
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.Stage;
+import sample.Model.Customer;
 
 import javax.swing.*;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
 public class Controller {
+
     public static Customer customer;
     private static int IDENTIFICATION_KEY;
     public Map<Integer, Customer> customerMap = new HashMap<>();
     public TextField username_txt;
     public PasswordField password_txt;
     public ImageView sign_img;
+
+    private boolean isVerified = false;
 
     protected String host;
     protected String root;
@@ -29,18 +40,27 @@ public class Controller {
 
     public void initialize() {
         loadServerSettings();
+
     }
 
-    public void authorize_login(MouseEvent actionEvent) {
+    public void authorize_login(MouseEvent actionEvent) throws IOException {
         if (username_txt.getLength() == 0 || password_txt.getLength() == 0) {
             viewMessage("Var vänlig fyll in dina inloggningsuppgifter");
         } else {
             connectToDatabase(host, root, keypass);
             customerMap.put(IDENTIFICATION_KEY, customer);
+
+            if (isVerified == true){
+                Parent portal_parent = FXMLLoader.load(getClass().getClassLoader().getResource("sample/FXML/shoe_portal.fxml"));
+                Scene portal_scene = new Scene(portal_parent);
+                Stage window = (Stage) ((Node)actionEvent.getSource()).getScene().getWindow();
+                window.setScene(portal_scene);
+                window.show();
+            }
         }
     }
 
-    public void connectToDatabase(String host, String user, String password) {
+    public boolean connectToDatabase(String host, String user, String password) {
         try (Connection conn = DriverManager.getConnection(host, user, password)) {
             PreparedStatement statement = conn.prepareStatement("SELECT * FROM customer WHERE (email = ? OR person_id = ?) AND password = ?");
 
@@ -53,14 +73,17 @@ public class Controller {
             if (resultSet.next()) {
                 viewMessage("Välkommen till shoeline");
                 customer = fetchCustomerData(resultSet);
-
+                isVerified = true;
             } else {
                 viewMessage("Felaktig data inmatat");
+                isVerified = false;
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
+                return isVerified;
+
     }
 
     public void loadServerSettings() {
@@ -77,7 +100,7 @@ public class Controller {
         }
     }
 
-    public void viewMessage(String message){
+    public void viewMessage(String message) {
         JOptionPane.showMessageDialog(null, message);
     }
 
@@ -101,4 +124,5 @@ public class Controller {
         }
         return customer;
     }
+
 }

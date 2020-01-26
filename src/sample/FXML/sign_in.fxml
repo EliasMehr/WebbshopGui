@@ -9,11 +9,11 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="440.0" prefWidth="979.0" style="-fx-background-color: #0c1a3f;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="440.0" prefWidth="979.0" style="-fx-background-color: #0c1a3f;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controllers.Controller">
    <children>
       <ImageView disable="true" fitHeight="456.0" fitWidth="600.0" layoutY="-3.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@../img/bg/bg2.gif" />
+            <Image url="@../../img/bg/bg2.gif" />
          </image>
       </ImageView>
       <PasswordField fx:id="password_txt" layoutX="654.0" layoutY="196.0" prefHeight="25.0" prefWidth="249.0" promptText="Ange ditt lösenord" />
@@ -28,7 +28,7 @@
          </font></Label>
       <ImageView fx:id="sign_img" accessibleRole="BUTTON" accessibleText="Press to sign in" fitHeight="49.0" fitWidth="49.0" layoutX="916.0" layoutY="169.0" onMouseClicked="#authorize_login" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@../img/icons/login.png" />
+            <Image url="@../../img/icons/login.png" />
          </image>
       </ImageView>
    </children>
