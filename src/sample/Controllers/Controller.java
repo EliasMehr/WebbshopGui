@@ -25,12 +25,12 @@ import java.util.Properties;
 public class Controller {
 
     public static Customer customer;
-    private static int IDENTIFICATION_KEY;
     public Map<Integer, Customer> customerMap = new HashMap<>();
     public TextField username_txt;
     public PasswordField password_txt;
     public ImageView sign_img;
 
+    private static int IDENTIFICATION_KEY;
     private boolean isVerified = false;
 
     protected String host;
@@ -40,7 +40,8 @@ public class Controller {
 
     public void initialize() {
         loadServerSettings();
-
+        username_txt.setText("adam.boyaci@gmail.com");
+        password_txt.setText("Halloj12!");
     }
 
     public void authorize_login(MouseEvent actionEvent) throws IOException {

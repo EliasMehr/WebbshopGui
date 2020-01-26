@@ -10,7 +10,6 @@ public class Shoe {
     private int quantity_in_stock;
     private int unit_price;
 
-    public Shoe() {}
 
     public Shoe(int shoe_id, Category category_id, Brand brand_id, String model_name, Color color_id, Size size_id, int quantity_in_stock, int unit_price) {
         this.shoe_id = shoe_id;
@@ -85,5 +84,16 @@ public class Shoe {
 
     public void setUnit_price(int unit_price) {
         this.unit_price = unit_price;
+    }
+
+    @Override
+    public String toString() {
+        return "Category: " + category_id + "\n" +
+                "Brand: " + brand_id + "\n" +
+                "Model: " + model_name + "\n" +
+                "Color: " + color_id + "\n" +
+                "Size: " + size_id + "\n" +
+                "Quantity: " + quantity_in_stock + "\n" +
+                "Price: " + unit_price + "\n";
     }
 }
