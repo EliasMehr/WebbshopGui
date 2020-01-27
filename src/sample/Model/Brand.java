@@ -29,6 +29,6 @@ public class Brand {
 
     @Override
     public String toString() {
-        return getBrand_id() + " " + getBrand();
+        return getBrand();
     }
 }

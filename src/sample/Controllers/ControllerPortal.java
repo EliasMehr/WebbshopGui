@@ -1,9 +1,16 @@
 package sample.Controllers;
 
 import javafx.event.ActionEvent;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.stage.Stage;
 import sample.Model.*;
 
 import java.io.FileInputStream;
@@ -17,9 +24,12 @@ import java.util.Properties;
 public class ControllerPortal {
 
     public ListView<Shoe> product_tree;
+    public ListView<Shoe> cartView;
     public Label shoe_availability;
     public Button addItemToCart;
-    public ListView<Shoe> cartView;
+    public Label identity_label;
+    public Button delete_item_btn;
+    public Button process_order_btn;
 
     // SQL Table_ID Tags
     protected int CATEGORY_IDENTITY_KEY;
@@ -33,12 +43,13 @@ public class ControllerPortal {
     protected String keypass;
 
     // HashMaps representing each table in SQL-Server
+
     private Map<Integer, Category> category_list = new HashMap<>();
     private Map<Integer, Brand> brand_list = new HashMap<>();
     private Map<Integer, Color> color_list = new HashMap<>();
     private Map<Integer, Size> size_list = new HashMap<>();
     private Map<Integer, Shoe> product_list = new HashMap<>();
-    private Map<Integer, Shoe> itemCart_list = new HashMap<>();
+    private Map<Integer, OrderItem> itemCart_list = new HashMap<>();
 
     public void initialize() {
         loadServerSettings();
@@ -48,10 +59,15 @@ public class ControllerPortal {
         getSize();
         getAllProductItems();
 
+
         product_list.entrySet().stream().filter(shoe -> shoe.getValue().getQuantity_in_stock() > 0).forEach(index -> product_tree.getItems().add(index.getValue()));
+
         shoe_availability.setText("Tillgängliga skor: " + product_tree.getItems().size());
+        identity_label.setText("Inloggad som: " + Controller.customer.getFirst_name() + "." + Controller.customer.getLast_name());
 
-
+        addItemToCart.setGraphic(new ImageView("img/icons/add_btn.png"));
+        delete_item_btn.setGraphic(new ImageView("img/icons/delete_btn.png"));
+        process_order_btn.setGraphic(new ImageView("img/icons/purchase_btn.png"));
     }
 
     public void loadServerSettings() {
@@ -67,7 +83,6 @@ public class ControllerPortal {
             e.printStackTrace();
         }
     }
-
 
     public void getAllProductItems() {
         try (Connection conn = DriverManager.getConnection(host, root, keypass)) {
@@ -90,7 +105,6 @@ public class ControllerPortal {
                         color_list.get(colorID),
                         size_list.get(sizeID),
                         quantity_in_stock, unit_price));
-
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -158,11 +172,43 @@ public class ControllerPortal {
     }
 
     public void addItem(ActionEvent actionEvent) {
-       itemCart_list.put(
-        product_tree.getSelectionModel().getSelectedItem().getShoe_id(),
-        product_tree.getSelectionModel().getSelectedItem()
-       );
+        itemCart_list.put(
+                product_tree.getSelectionModel().getSelectedItem().getShoe_id(),
+               // product_tree.getSelectionModel().getSelectedItem()
+        );
 
+        cartView.getItems().addAll(product_tree.getSelectionModel().getSelectedItems());
+        process_order_btn.setText("Slutför beställning (" + itemCart_list.size() +")");
+        itemCart_list.forEach((key, value) -> System.out.println(value));
+    }
 
+    public void signOut(ActionEvent actionEvent) {
+        // TODO
+    }
+
+    public void viewProfile(ActionEvent actionEvent) throws IOException {
+        Parent profile_parent = FXMLLoader.load(getClass().getClassLoader().getResource("sample/FXML/customer_info.fxml"));
+        Scene profile_scene = new Scene(profile_parent);
+        Stage window = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+        window.setScene(profile_scene);
+        window.show();
+    }
+
+    public void deleteItem(ActionEvent actionEvent) {
+        cartView.getItems().remove(cartView.getSelectionModel().getSelectedItem());
+        int index = cartView.getSelectionModel().getSelectedItem().getShoe_id();
+        itemCart_list.remove(index);
+        process_order_btn.setText("Slutför beställning (" + itemCart_list.size() +")");
+        if (itemCart_list.size() == 0) {
+            System.out.println("Varukorg tom");
+        } else {
+            itemCart_list.forEach((key, value) -> System.out.println(value));
+        }
     }
 }
+
+// -- TODO
+// Ändra så att ifall man lägger till samma produkt i varukorgen så ökas kvantiteten istället.
+// Vill inte lägga till i min varukorg ifall min Stored procedure misslyckas -> Throw Exception för SQL
+// Ta fram LAST INSERT ID i java
+//
