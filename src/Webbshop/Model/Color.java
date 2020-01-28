@@ -1,4 +1,4 @@
-package sample.Model;
+package Webbshop.Model;
 
 public class Color {
     private int color_id;

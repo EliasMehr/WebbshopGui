@@ -1,4 +1,4 @@
-package sample.Model;
+package Webbshop.Model;
 
 import java.time.LocalDate;
 import java.util.HashMap;

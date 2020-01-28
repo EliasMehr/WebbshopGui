@@ -1,4 +1,4 @@
-package sample.Controllers;
+package Webbshop.Controllers;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
@@ -11,7 +11,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
-import sample.Model.*;
+import Webbshop.Main;
+import Webbshop.Model.*;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -34,10 +35,10 @@ public class ControllerPortal {
     public int currentOrderID = 0;
 
     // SQL Table_ID Tags
-    protected int CATEGORY_IDENTITY_KEY;
-    protected int BRAND_IDENTITY_KEY;
-    protected int COLOR_IDENTITY_KEY;
-    protected int SIZE_IDENTITY_KEY;
+    protected int CATEGORY_KEY;
+    protected int BRAND_KEY;
+    protected int COLOR_KEY;
+    protected int SIZE_KEY;
 
     // SQL Server user configuration
     protected String host;
@@ -62,7 +63,7 @@ public class ControllerPortal {
         refreshProductItems();
 
 
-        identity_label.setText("Inloggad som: " + Controller.customer.getFirst_name() + "." + Controller.customer.getLast_name());
+        identity_label.setText("Inloggad som: " + Main.customerObject.getFirst_name() + "." + Main.customerObject.getLast_name());
 
         addItemToCart.setGraphic(new ImageView("img/icons/add_btn.png"));
         delete_item_btn.setGraphic(new ImageView("img/icons/delete_btn.png"));
@@ -76,7 +77,7 @@ public class ControllerPortal {
     }
 
     public void loadServerSettings() {
-        try (InputStream inputStream = new FileInputStream("src/sample/db_server.properties")) {
+        try (InputStream inputStream = new FileInputStream("src/Webbshop/db_server.properties")) {
             Properties load_server_settings = new Properties();
             load_server_settings.load(inputStream);
             host = load_server_settings.getProperty("host");
@@ -122,9 +123,9 @@ public class ControllerPortal {
             ResultSet resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
-                CATEGORY_IDENTITY_KEY = resultSet.getInt(1);
+                CATEGORY_KEY = resultSet.getInt(1);
                 String CATEGORY = resultSet.getString(2);
-                categoryMap.put(CATEGORY_IDENTITY_KEY, new Category(CATEGORY_IDENTITY_KEY, CATEGORY.toUpperCase()));
+                categoryMap.put(CATEGORY_KEY, new Category(CATEGORY_KEY, CATEGORY.toUpperCase()));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -137,9 +138,9 @@ public class ControllerPortal {
             ResultSet resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
-                BRAND_IDENTITY_KEY = resultSet.getInt(1);
+                BRAND_KEY = resultSet.getInt(1);
                 String BRAND = resultSet.getString(2);
-                brandMap.put(BRAND_IDENTITY_KEY, new Brand(BRAND_IDENTITY_KEY, BRAND.toUpperCase()));
+                brandMap.put(BRAND_KEY, new Brand(BRAND_KEY, BRAND.toUpperCase()));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -152,9 +153,9 @@ public class ControllerPortal {
             ResultSet resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
-                COLOR_IDENTITY_KEY = resultSet.getInt(1);
+                COLOR_KEY = resultSet.getInt(1);
                 String COLOR = resultSet.getString(2);
-                colorMap.put(COLOR_IDENTITY_KEY, new Color(COLOR_IDENTITY_KEY, COLOR.toUpperCase()));
+                colorMap.put(COLOR_KEY, new Color(COLOR_KEY, COLOR.toUpperCase()));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -167,9 +168,9 @@ public class ControllerPortal {
             ResultSet resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
-                SIZE_IDENTITY_KEY = resultSet.getInt(1);
+                SIZE_KEY = resultSet.getInt(1);
                 String SIZE = resultSet.getString(2);
-                sizeMap.put(SIZE_IDENTITY_KEY, new Size(SIZE_IDENTITY_KEY, SIZE.toUpperCase()));
+                sizeMap.put(SIZE_KEY, new Size(SIZE_KEY, SIZE.toUpperCase()));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -224,10 +225,10 @@ public class ControllerPortal {
     }
 
     public void signOut(ActionEvent actionEvent) throws IOException {
-        Controller.customer = null;
+        Main.customerObject = null;
         currentOrderID = 0;
 
-        Parent login_parent = FXMLLoader.load(getClass().getClassLoader().getResource("sample/FXML/sign_in.fxml"));
+        Parent login_parent = FXMLLoader.load(getClass().getClassLoader().getResource("Webbshop/FXML/sign_in.fxml"));
         Scene login_scene = new Scene(login_parent);
         Stage window = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
         window.setScene(login_scene);
@@ -235,7 +236,7 @@ public class ControllerPortal {
     }
 
     public void viewProfile(ActionEvent actionEvent) throws IOException {
-        Parent profile_parent = FXMLLoader.load(getClass().getClassLoader().getResource("sample/FXML/customer_info.fxml"));
+        Parent profile_parent = FXMLLoader.load(getClass().getClassLoader().getResource("Webbshop/FXML/customer_info.fxml"));
         Scene profile_scene = new Scene(profile_parent);
         Stage window = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
         window.setScene(profile_scene);
@@ -245,11 +246,11 @@ public class ControllerPortal {
     public void processOrder(ActionEvent actionEvent) {
         for (OrderItem item : cartView.getItems()) {
             for (int i = 0; i < item.getQuantity(); i++) {
-                addToCart(currentOrderID, Controller.IDENTIFICATION_KEY, item.getShoe().getShoe_id());
+                addToCart(currentOrderID, Main.CUSTOMER_KEY, item.getShoe().getShoe_id());
             }
         }
 
-        Controller.viewMessage("Din order har nu lagts", "ORDER BEKRÄFTELSE", Alert.AlertType.INFORMATION);
+        Main.viewMessage("Din order har nu lagts", "ORDER BEKRÄFTELSE", Alert.AlertType.INFORMATION);
         cartView.getItems().clear();
         product_tree.getItems().clear();
         currentOrderID = 0;
@@ -271,7 +272,7 @@ public class ControllerPortal {
             resultSet.next();
 
             if (hasErrorColumn(resultSet, "ERROR_MESSAGE")) {
-                Controller.viewMessage(resultSet.getString("ERROR_MESSAGE"), "Kan inte behandla din order", Alert.AlertType.WARNING);
+                Main.viewMessage(resultSet.getString("ERROR_MESSAGE"), "Kan inte behandla din order", Alert.AlertType.WARNING);
             } else if (hasErrorColumn(resultSet, "newOrderID")) {
                 currentOrderID = resultSet.getInt("newOrderID");
             }

@@ -1,4 +1,4 @@
-package sample.Model;
+package Webbshop.Model;
 
 public class Review {
     private int review_id;

@@ -1,4 +1,4 @@
-package sample.Model;
+package Webbshop.Model;
 
 public class Brand {
     private int brand_id;

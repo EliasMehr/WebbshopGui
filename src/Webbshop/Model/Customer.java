@@ -1,4 +1,4 @@
-package sample.Model;
+package Webbshop.Model;
 
 import java.util.HashMap;
 import java.util.Map;

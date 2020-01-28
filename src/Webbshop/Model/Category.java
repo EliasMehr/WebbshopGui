@@ -1,4 +1,4 @@
-package sample.Model;
+package Webbshop.Model;
 
 public class Category {
     private int category_id;

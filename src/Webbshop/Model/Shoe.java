@@ -1,4 +1,4 @@
-package sample.Model;
+package Webbshop.Model;
 
 public class Shoe {
     private int shoe_id;
