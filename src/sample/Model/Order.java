@@ -1,19 +1,25 @@
 package sample.Model;
 
 import java.time.LocalDate;
-import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Order {
     private int order_id;
-    private Customer customer_id;
     private LocalDate currentDate;
+    private Map<Integer, OrderItem> orderItems = new HashMap<>();
 
-    public Order() {}
-
-    public Order(int order_id, Customer customer_id) {
+    public Order(int order_id) {
         this.order_id = order_id;
-        this.customer_id = customer_id;
-        this.currentDate =  LocalDate.now();
+        this.currentDate = LocalDate.now();
+    }
+
+    public Map<Integer, OrderItem> getOrderItems() {
+        return orderItems;
+    }
+
+    public void setOrderItems(Map<Integer, OrderItem> orderItems) {
+        this.orderItems = orderItems;
     }
 
     public int getOrder_id() {
@@ -22,14 +28,6 @@ public class Order {
 
     public void setOrder_id(int order_id) {
         this.order_id = order_id;
-    }
-
-    public Customer getCustomer_id() {
-        return customer_id;
-    }
-
-    public void setCustomer_id(Customer customer_id) {
-        this.customer_id = customer_id;
     }
 
     public LocalDate getCurrentDate() {

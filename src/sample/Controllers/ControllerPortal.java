@@ -172,10 +172,10 @@ public class ControllerPortal {
     }
 
     public void addItem(ActionEvent actionEvent) {
-        itemCart_list.put(
-                product_tree.getSelectionModel().getSelectedItem().getShoe_id(),
-               // product_tree.getSelectionModel().getSelectedItem()
-        );
+//        itemCart_list.put(
+//                product_tree.getSelectionModel().getSelectedItem().getShoe_id(),
+//               // product_tree.getSelectionModel().getSelectedItem()
+//        );
 
         cartView.getItems().addAll(product_tree.getSelectionModel().getSelectedItems());
         process_order_btn.setText("Slutför beställning (" + itemCart_list.size() +")");

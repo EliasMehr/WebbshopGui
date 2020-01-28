@@ -1,5 +1,8 @@
 package sample.Model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Customer {
     private int customer_id;
     private String first_name;
@@ -10,6 +13,9 @@ public class Customer {
     private String phone;
     private String email;
     private String person_id;
+
+    private Map<Integer, Order> orderMap = new HashMap<>();
+    private Map<Integer, Review> reviewMap = new HashMap<>();
 
     public Customer() {}
 
@@ -22,6 +28,22 @@ public class Customer {
         this.phone = phone;
         this.email = email;
         this.person_id = person_id;
+    }
+
+    public Map<Integer, Order> getOrderMap() {
+        return orderMap;
+    }
+
+    public void setOrderMap(Map<Integer, Order> orderMap) {
+        this.orderMap = orderMap;
+    }
+
+    public Map<Integer, Review> getReviewMap() {
+        return reviewMap;
+    }
+
+    public void setReviewMap(Map<Integer, Review> reviewMap) {
+        this.reviewMap = reviewMap;
     }
 
     public int getCustomer_id() {

@@ -3,15 +3,12 @@ package sample.Model;
 import com.mysql.cj.x.protobuf.MysqlxCrud;
 
 public class OrderItem {
-    private int orderItem_id;
     private Shoe shoe_id;
+    private int orderItem_id;
     private int quantity;
-
-    public OrderItem() {}
 
     public OrderItem(int orderItem_id, Shoe shoe_id, int quantity) {
         this.orderItem_id = orderItem_id;
-
         this.shoe_id = shoe_id;
         this.quantity = quantity;
     }
@@ -23,7 +20,6 @@ public class OrderItem {
     public void setOrderItem_id(int orderItem_id) {
         this.orderItem_id = orderItem_id;
     }
-
 
     public Shoe getShoe_id() {
         return shoe_id;
