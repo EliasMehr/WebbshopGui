@@ -3,7 +3,7 @@ DROP TRIGGER IF EXISTS update_stocktake;
 DELIMITER $$
 
 CREATE TRIGGER update_stocktake
-AFTER UPDATE ON shoes
+AFTER UPDATE ON shoe
 FOR EACH ROW
 BEGIN
 	IF (new.quantity_in_stock = 0) THEN

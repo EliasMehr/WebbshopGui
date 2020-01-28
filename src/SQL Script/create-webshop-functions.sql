@@ -76,3 +76,19 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+
+DROP FUNCTION IF EXISTS validate_if_rating_exists;
+
+DELIMITER $$
+
+CREATE FUNCTION validate_if_rating_exists(input_ratingID INT)
+RETURNS BOOLEAN
+BEGIN
+DECLARE check_ratingExistance BOOLEAN;
+SELECT COUNT(*) INTO check_ratingExistance
+FROM rating WHERE rating_id = input_ratingID;
+RETURN check_ratingExistance;
+END $$
+
+DELIMITER ;

@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -25,11 +26,12 @@ public class ControllerPortal {
     public ListView<Shoe> product_tree;
     public ListView<OrderItem> cartView;
     public Label shoe_availability;
-    public Button addItemToCart;
+    public Label total_cart_amount;
     public Label identity_label;
+    public Button addItemToCart;
     public Button delete_item_btn;
     public Button process_order_btn;
-    public Label total_cart_amount;
+    public int currentOrderID = 0;
 
     // SQL Table_ID Tags
     protected int CATEGORY_IDENTITY_KEY;
@@ -49,7 +51,6 @@ public class ControllerPortal {
     private Map<Integer, Color> colorMap = new HashMap<>();
     private Map<Integer, Size> sizeMap = new HashMap<>();
     private Map<Integer, Shoe> productMap = new HashMap<>();
-    private Map<Integer, OrderItem> orderItemMap = new HashMap<>();
 
     public void initialize() {
         loadServerSettings();
@@ -58,16 +59,20 @@ public class ControllerPortal {
         getColor();
         getSize();
         getAllProductItems();
+        refreshProductItems();
 
 
-
-        productMap.entrySet().stream().filter(shoe -> shoe.getValue().getQuantity_in_stock() > 0).forEach(index -> product_tree.getItems().add(index.getValue()));
-        shoe_availability.setText("Tillgängliga skor: " + product_tree.getItems().size());
         identity_label.setText("Inloggad som: " + Controller.customer.getFirst_name() + "." + Controller.customer.getLast_name());
 
         addItemToCart.setGraphic(new ImageView("img/icons/add_btn.png"));
         delete_item_btn.setGraphic(new ImageView("img/icons/delete_btn.png"));
         process_order_btn.setGraphic(new ImageView("img/icons/purchase_btn.png"));
+    }
+
+    private void refreshProductItems() {
+        productMap.entrySet().stream().filter(shoe -> shoe.getValue().getQuantity_in_stock() > 0).forEach(index -> product_tree.getItems().add(index.getValue()));
+        shoe_availability.setText("Tillgängliga skor: " + product_tree.getItems().size());
+        product_tree.refresh();
     }
 
     public void loadServerSettings() {
@@ -171,10 +176,8 @@ public class ControllerPortal {
         }
     }
 
-    public void addItem(ActionEvent actionEvent) {
+    public void addSelectedItem(ActionEvent actionEvent) {
         boolean isAlreadyInCart = false;
-        int quantity = 0;
-        int sum;
 
         Shoe shoe = product_tree.getSelectionModel().getSelectedItem();
 
@@ -190,16 +193,40 @@ public class ControllerPortal {
             cartView.getItems().add(new OrderItem(shoe, 1));
         }
 
+        updateCartInformation();
+
+    }
+
+    public void deleteSelectedItem(ActionEvent actionEvent) {
+        OrderItem selectedItem = cartView.getSelectionModel().getSelectedItem();
+
+        for (OrderItem item : cartView.getItems()) {
+            if (item.equals(selectedItem)) {
+                selectedItem.setQuantity(selectedItem.getQuantity() - 1);
+            }
+        }
+        if (selectedItem.getQuantity() == 0) {
+            cartView.getItems().remove(selectedItem);
+        }
+
+        cartView.refresh();
+        updateCartInformation();
+    }
+
+    private void updateCartInformation() {
+        int sum;
+        int quantity;
         sum = cartView.getItems().stream().mapToInt(orderItem -> orderItem.getQuantity() * orderItem.getShoe().getUnit_price()).sum();
         total_cart_amount.setText("Total summa: " + sum + "SEK");
+
         quantity = cartView.getItems().stream().mapToInt(OrderItem::getQuantity).sum();
         process_order_btn.setText("Slutför beställning (" + quantity + ")");
-
-
     }
 
     public void signOut(ActionEvent actionEvent) throws IOException {
         Controller.customer = null;
+        currentOrderID = 0;
+
         Parent login_parent = FXMLLoader.load(getClass().getClassLoader().getResource("sample/FXML/sign_in.fxml"));
         Scene login_scene = new Scene(login_parent);
         Stage window = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
@@ -215,17 +242,54 @@ public class ControllerPortal {
         window.show();
     }
 
-    public void deleteItem(ActionEvent actionEvent) {
-        cartView.getItems().remove(cartView.getSelectionModel().getSelectedItem());
-        // int index = cartView.getSelectionModel().getSelectedItem().getShoe();
-        //  orderItemMap.remove(index);
+    public void processOrder(ActionEvent actionEvent) {
+        for (OrderItem item : cartView.getItems()) {
+            for (int i = 0; i < item.getQuantity(); i++) {
+                addToCart(currentOrderID, Controller.IDENTIFICATION_KEY, item.getShoe().getShoe_id());
+            }
+        }
 
-        process_order_btn.setText("Slutför beställning (" + orderItemMap.size() + ")");
+        Controller.viewMessage("Din order har nu lagts", "ORDER BEKRÄFTELSE", Alert.AlertType.INFORMATION);
+        cartView.getItems().clear();
+        product_tree.getItems().clear();
+        currentOrderID = 0;
+        updateCartInformation();
+        getAllProductItems();
+        refreshProductItems();
+
+    }
+
+    private void addToCart(int orderID, int customerID, int shoeID) {
+        try (Connection conn = DriverManager.getConnection(host, root, keypass)) {
+            PreparedStatement statement = conn.prepareCall("CALL addToCart(?, ?, ?)");
+
+            statement.setInt(1, orderID);
+            statement.setInt(2, customerID);
+            statement.setInt(3, shoeID);
+
+            ResultSet resultSet = statement.executeQuery();
+            resultSet.next();
+
+            if (hasErrorColumn(resultSet, "ERROR_MESSAGE")) {
+                Controller.viewMessage(resultSet.getString("ERROR_MESSAGE"), "Kan inte behandla din order", Alert.AlertType.WARNING);
+            } else if (hasErrorColumn(resultSet, "newOrderID")) {
+                currentOrderID = resultSet.getInt("newOrderID");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean hasErrorColumn(ResultSet resultSet, String columnName) throws SQLException {
+        ResultSetMetaData metaData = resultSet.getMetaData();
+        int columnCount = metaData.getColumnCount();
+
+        for (int i = 1; i <= columnCount; i++) {
+            if (metaData.getColumnName(i).equals(columnName)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
-
-// -- TODO
-// Ändra så att ifall man lägger till samma produkt i varukorgen så ökas kvantiteten istället.
-// Vill inte lägga till i min varukorg ifall min Stored procedure misslyckas -> Throw Exception för SQL
-// Ta fram LAST INSERT ID i java
-//

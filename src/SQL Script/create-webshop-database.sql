@@ -98,7 +98,7 @@ CREATE TABLE review (
     comments VARCHAR(255) NOT NULL,
     rating_id INT NOT NULL,
     PRIMARY KEY (review_id),
-
+    UNIQUE KEY (customer_id, shoe_id),
     FOREIGN KEY (customer_id) REFERENCES customer(customer_id),
     FOREIGN KEY (shoe_id) REFERENCES shoe(shoe_id),
     FOREIGN KEY (rating_id) REFERENCES rating(rating_id)

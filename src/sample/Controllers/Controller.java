@@ -98,7 +98,7 @@ public class Controller {
         }
     }
 
-    public void viewMessage(String message, String title , Alert.AlertType alertType) {
+    public static void viewMessage(String message, String title , Alert.AlertType alertType) {
         Alert alert = new Alert(alertType);
         alert.setContentText(message);
         alert.setTitle(title);
