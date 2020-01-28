@@ -14,7 +14,7 @@ public class Customer {
     private String email;
     private String person_id;
 
-    private Map<Integer, Order> orderMap = new HashMap<>();
+    private Map<Integer, Orders> orderMap = new HashMap<>();
     private Map<Integer, Review> reviewMap = new HashMap<>();
 
     public Customer() {}
@@ -30,11 +30,11 @@ public class Customer {
         this.person_id = person_id;
     }
 
-    public Map<Integer, Order> getOrderMap() {
+    public Map<Integer, Orders> getOrderMap() {
         return orderMap;
     }
 
-    public void setOrderMap(Map<Integer, Order> orderMap) {
+    public void setOrderMap(Map<Integer, Orders> orderMap) {
         this.orderMap = orderMap;
     }
 

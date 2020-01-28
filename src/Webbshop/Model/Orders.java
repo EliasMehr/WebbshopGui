@@ -4,12 +4,12 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Order {
+public class Orders {
     private int order_id;
     private LocalDate currentDate;
     private Map<Integer, OrderItem> orderItems = new HashMap<>();
 
-    public Order(int order_id) {
+    public Orders(int order_id) {
         this.order_id = order_id;
         this.currentDate = LocalDate.now();
     }

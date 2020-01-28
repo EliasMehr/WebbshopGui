@@ -36,9 +36,11 @@ public class ControllerPortal {
 
         productMap = Repository.getAllProducts();
         refreshProductItems();
+        loadPlatformComponents();
+    }
 
+    private void loadPlatformComponents() {
         customerLabel.setText("Inloggad som: " + Main.customerObject.getFirst_name() + "." + Main.customerObject.getLast_name());
-
         addItemToCart.setGraphic(new ImageView("img/icons/add_btn.png"));
         deleteItemBtn.setGraphic(new ImageView("img/icons/delete_btn.png"));
         processOrderBtn.setGraphic(new ImageView("img/icons/purchase_btn.png"));
@@ -114,14 +116,25 @@ public class ControllerPortal {
     }
 
     public void processOrder(ActionEvent actionEvent) {
+
         for (OrderItem item : cartView.getItems()) {
             for (int i = 0; i < item.getQuantity(); i++) {
                 Repository.addToCart(Main.currentOrderID, Main.CUSTOMER_KEY, item.getShoe().getShoe_id());
             }
         }
 
-        Main.viewMessage("Din order har nu lagts", "ORDER BEKRÄFTELSE", Alert.AlertType.INFORMATION);
+        printOrderReceipt();
         resetWebShop();
+    }
+
+    private void printOrderReceipt() {
+        String message = "";
+        for (OrderItem item : cartView.getItems()) {
+          message += "Märke: " + item.getShoe().getBrand_id().getBrand() + "\n" + "Modell: " + item.getShoe().getModel_name() + "\n" +
+                    "Storlek: " + item.getShoe().getSize_id().getSize() + "\n" + "Färg: " + item.getShoe().getColor_id().getColor() + "\n" +
+                    "Antal: " + item.getQuantity() + "\n\n";
+        }
+        Main.viewMessage("Din order har nu lagts \n\n" + message + "\n SUMMA: " + total_cart_amount.getText(), "ORDER BEKRÄFTELSE", Alert.AlertType.INFORMATION);
     }
 
     private void resetWebShop() {
