@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="429.0" prefWidth="325.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Webbshop.Controllers.ControllerProfile">
+   <children>
+      <Label layoutX="43.0" layoutY="14.0" text="Min profil">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <TextField fx:id="cust_name" editable="false" layoutX="30.0" layoutY="85.0" prefHeight="25.0" prefWidth="267.0" promptText="null" />
+      <TextField fx:id="cust_last" editable="false" layoutX="30.0" layoutY="127.0" prefHeight="25.0" prefWidth="267.0" promptText="null" />
+      <TextField fx:id="cust_street" editable="false" layoutX="30.0" layoutY="169.0" prefHeight="25.0" prefWidth="267.0" promptText="null" />
+      <Label layoutX="30.0" layoutY="61.0" text="Förnamn" />
+      <Label layoutX="30.0" layoutY="110.0" text="Efternamn" />
+      <Label layoutX="30.0" layoutY="152.0" text="Adress" />
+      <Label layoutX="30.0" layoutY="194.0" text="Postnummer" />
+      <TextField fx:id="cust_zip" editable="false" layoutX="30.0" layoutY="211.0" prefHeight="25.0" prefWidth="267.0" promptText="null" />
+      <Label layoutX="30.0" layoutY="236.0" text="Ort" />
+      <TextField fx:id="cust_area" editable="false" layoutX="30.0" layoutY="253.0" prefHeight="25.0" prefWidth="267.0" promptText="null" />
+      <ImageView fitHeight="25.0" fitWidth="25.0" layoutX="14.0" layoutY="15.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../../img/icons/username_icon.png" />
+         </image>
+      </ImageView>
+      <Label layoutX="30.0" layoutY="278.0" text="Mobilnummer" />
+      <TextField fx:id="cust_phone" editable="false" layoutX="30.0" layoutY="295.0" prefHeight="25.0" prefWidth="267.0" promptText="null" />
+      <Label layoutX="30.0" layoutY="320.0" text="Epost" />
+      <TextField fx:id="cust_mail" editable="false" layoutX="30.0" layoutY="337.0" prefHeight="25.0" prefWidth="267.0" promptText="null" />
+      <Button fx:id="cust_delete_btn" layoutX="32.0" layoutY="376.0" mnemonicParsing="false" onAction="#deleteAccount" prefHeight="25.0" prefWidth="136.0" style="-fx-background-color: #FF0000;" text="Radera konto" textFill="WHITE" />
+      <Button fx:id="return_to_portal_btn" layoutX="181.0" layoutY="376.0" mnemonicParsing="false" onAction="#returnToPortal" text="Återgå till portalen" />
+   </children>
+</AnchorPane>
