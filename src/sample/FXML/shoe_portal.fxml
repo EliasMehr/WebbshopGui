@@ -34,5 +34,10 @@
          </font>
       </Button>
       <Button fx:id="process_order_btn" layoutX="693.0" layoutY="399.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="204.0" style="-fx-background-color: #FFFFFF;" text="Slutför beställning" />
+      <Label fx:id="total_cart_amount" layoutX="677.0" layoutY="454.0" text="Total summa:  " textFill="#06b933">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </Label>
    </children>
 </AnchorPane>

@@ -8,7 +8,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import sample.Model.*;
@@ -24,12 +23,13 @@ import java.util.Properties;
 public class ControllerPortal {
 
     public ListView<Shoe> product_tree;
-    public ListView<Shoe> cartView;
+    public ListView<OrderItem> cartView;
     public Label shoe_availability;
     public Button addItemToCart;
     public Label identity_label;
     public Button delete_item_btn;
     public Button process_order_btn;
+    public Label total_cart_amount;
 
     // SQL Table_ID Tags
     protected int CATEGORY_IDENTITY_KEY;
@@ -44,12 +44,12 @@ public class ControllerPortal {
 
     // HashMaps representing each table in SQL-Server
 
-    private Map<Integer, Category> category_list = new HashMap<>();
-    private Map<Integer, Brand> brand_list = new HashMap<>();
-    private Map<Integer, Color> color_list = new HashMap<>();
-    private Map<Integer, Size> size_list = new HashMap<>();
-    private Map<Integer, Shoe> product_list = new HashMap<>();
-    private Map<Integer, OrderItem> itemCart_list = new HashMap<>();
+    private Map<Integer, Category> categoryMap = new HashMap<>();
+    private Map<Integer, Brand> brandMap = new HashMap<>();
+    private Map<Integer, Color> colorMap = new HashMap<>();
+    private Map<Integer, Size> sizeMap = new HashMap<>();
+    private Map<Integer, Shoe> productMap = new HashMap<>();
+    private Map<Integer, OrderItem> orderItemMap = new HashMap<>();
 
     public void initialize() {
         loadServerSettings();
@@ -60,8 +60,8 @@ public class ControllerPortal {
         getAllProductItems();
 
 
-        product_list.entrySet().stream().filter(shoe -> shoe.getValue().getQuantity_in_stock() > 0).forEach(index -> product_tree.getItems().add(index.getValue()));
 
+        productMap.entrySet().stream().filter(shoe -> shoe.getValue().getQuantity_in_stock() > 0).forEach(index -> product_tree.getItems().add(index.getValue()));
         shoe_availability.setText("Tillgängliga skor: " + product_tree.getItems().size());
         identity_label.setText("Inloggad som: " + Controller.customer.getFirst_name() + "." + Controller.customer.getLast_name());
 
@@ -100,10 +100,10 @@ public class ControllerPortal {
                 int quantity_in_stock = resultSet.getInt(7);
                 int unit_price = resultSet.getInt(8);
 
-                product_list.put(shoeID, new Shoe(shoeID, category_list.get(categoryID),
-                        brand_list.get(brandID), model,
-                        color_list.get(colorID),
-                        size_list.get(sizeID),
+                productMap.put(shoeID, new Shoe(shoeID, categoryMap.get(categoryID),
+                        brandMap.get(brandID), model,
+                        colorMap.get(colorID),
+                        sizeMap.get(sizeID),
                         quantity_in_stock, unit_price));
             }
         } catch (SQLException e) {
@@ -119,7 +119,7 @@ public class ControllerPortal {
             while (resultSet.next()) {
                 CATEGORY_IDENTITY_KEY = resultSet.getInt(1);
                 String CATEGORY = resultSet.getString(2);
-                category_list.put(CATEGORY_IDENTITY_KEY, new Category(CATEGORY_IDENTITY_KEY, CATEGORY.toUpperCase()));
+                categoryMap.put(CATEGORY_IDENTITY_KEY, new Category(CATEGORY_IDENTITY_KEY, CATEGORY.toUpperCase()));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -134,7 +134,7 @@ public class ControllerPortal {
             while (resultSet.next()) {
                 BRAND_IDENTITY_KEY = resultSet.getInt(1);
                 String BRAND = resultSet.getString(2);
-                brand_list.put(BRAND_IDENTITY_KEY, new Brand(BRAND_IDENTITY_KEY, BRAND.toUpperCase()));
+                brandMap.put(BRAND_IDENTITY_KEY, new Brand(BRAND_IDENTITY_KEY, BRAND.toUpperCase()));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -149,7 +149,7 @@ public class ControllerPortal {
             while (resultSet.next()) {
                 COLOR_IDENTITY_KEY = resultSet.getInt(1);
                 String COLOR = resultSet.getString(2);
-                color_list.put(COLOR_IDENTITY_KEY, new Color(COLOR_IDENTITY_KEY, COLOR.toUpperCase()));
+                colorMap.put(COLOR_IDENTITY_KEY, new Color(COLOR_IDENTITY_KEY, COLOR.toUpperCase()));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -164,7 +164,7 @@ public class ControllerPortal {
             while (resultSet.next()) {
                 SIZE_IDENTITY_KEY = resultSet.getInt(1);
                 String SIZE = resultSet.getString(2);
-                size_list.put(SIZE_IDENTITY_KEY, new Size(SIZE_IDENTITY_KEY, SIZE.toUpperCase()));
+                sizeMap.put(SIZE_IDENTITY_KEY, new Size(SIZE_IDENTITY_KEY, SIZE.toUpperCase()));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -172,18 +172,39 @@ public class ControllerPortal {
     }
 
     public void addItem(ActionEvent actionEvent) {
-//        itemCart_list.put(
-//                product_tree.getSelectionModel().getSelectedItem().getShoe_id(),
-//               // product_tree.getSelectionModel().getSelectedItem()
-//        );
+        boolean isAlreadyInCart = false;
+        int quantity = 0;
+        int sum;
 
-        cartView.getItems().addAll(product_tree.getSelectionModel().getSelectedItems());
-        process_order_btn.setText("Slutför beställning (" + itemCart_list.size() +")");
-        itemCart_list.forEach((key, value) -> System.out.println(value));
+        Shoe shoe = product_tree.getSelectionModel().getSelectedItem();
+
+        for (OrderItem item : cartView.getItems()) {
+            if (shoe.equals(item.getShoe())) {
+                item.setQuantity(item.getQuantity() + 1);
+                isAlreadyInCart = true;
+                cartView.refresh();
+            }
+        }
+
+        if (!isAlreadyInCart) {
+            cartView.getItems().add(new OrderItem(shoe, 1));
+        }
+
+        sum = cartView.getItems().stream().mapToInt(orderItem -> orderItem.getQuantity() * orderItem.getShoe().getUnit_price()).sum();
+        total_cart_amount.setText("Total summa: " + sum + "SEK");
+        quantity = cartView.getItems().stream().mapToInt(OrderItem::getQuantity).sum();
+        process_order_btn.setText("Slutför beställning (" + quantity + ")");
+
+
     }
 
-    public void signOut(ActionEvent actionEvent) {
-        // TODO
+    public void signOut(ActionEvent actionEvent) throws IOException {
+        Controller.customer = null;
+        Parent login_parent = FXMLLoader.load(getClass().getClassLoader().getResource("sample/FXML/sign_in.fxml"));
+        Scene login_scene = new Scene(login_parent);
+        Stage window = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+        window.setScene(login_scene);
+        window.show();
     }
 
     public void viewProfile(ActionEvent actionEvent) throws IOException {
@@ -196,14 +217,10 @@ public class ControllerPortal {
 
     public void deleteItem(ActionEvent actionEvent) {
         cartView.getItems().remove(cartView.getSelectionModel().getSelectedItem());
-        int index = cartView.getSelectionModel().getSelectedItem().getShoe_id();
-        itemCart_list.remove(index);
-        process_order_btn.setText("Slutför beställning (" + itemCart_list.size() +")");
-        if (itemCart_list.size() == 0) {
-            System.out.println("Varukorg tom");
-        } else {
-            itemCart_list.forEach((key, value) -> System.out.println(value));
-        }
+        // int index = cartView.getSelectionModel().getSelectedItem().getShoe();
+        //  orderItemMap.remove(index);
+
+        process_order_btn.setText("Slutför beställning (" + orderItemMap.size() + ")");
     }
 }
 

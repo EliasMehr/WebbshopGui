@@ -1,32 +1,20 @@
 package sample.Model;
 
-import com.mysql.cj.x.protobuf.MysqlxCrud;
-
 public class OrderItem {
-    private Shoe shoe_id;
-    private int orderItem_id;
+    private Shoe shoe;
     private int quantity;
 
-    public OrderItem(int orderItem_id, Shoe shoe_id, int quantity) {
-        this.orderItem_id = orderItem_id;
-        this.shoe_id = shoe_id;
+    public OrderItem(Shoe shoe, int quantity) {
+        this.shoe = shoe;
         this.quantity = quantity;
     }
 
-    public int getOrderItem_id() {
-        return orderItem_id;
+    public Shoe getShoe() {
+        return shoe;
     }
 
-    public void setOrderItem_id(int orderItem_id) {
-        this.orderItem_id = orderItem_id;
-    }
-
-    public Shoe getShoe_id() {
-        return shoe_id;
-    }
-
-    public void setShoe_id(Shoe shoe_id) {
-        this.shoe_id = shoe_id;
+    public void setShoe(Shoe shoe) {
+        this.shoe = shoe;
     }
 
     public int getQuantity() {
@@ -35,5 +23,10 @@ public class OrderItem {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    @Override
+    public String toString() {
+        return shoe.getBrand_id().getBrand() + " " + shoe.getModel_name() + " " + shoe.getSize_id().getSize() + " " + shoe.getColor_id().getColor() + " Antal: " + quantity;
     }
 }
