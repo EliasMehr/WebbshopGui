@@ -12,12 +12,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import Webbshop.Main;
-import Webbshop.Model.Customer;
-
 import java.io.IOException;
-import java.sql.*;
-import java.util.HashMap;
-import java.util.Map;
+
 
 public class Controller {
 
@@ -27,9 +23,6 @@ public class Controller {
 
     public void initialize() {
         Repository.loadServerSettings();
-
-        username_txt.setText("adam.boyaci@gmail.com");
-        password_txt.setText("Halloj12!");
     }
 
     public void authorize_login(MouseEvent actionEvent) throws IOException {

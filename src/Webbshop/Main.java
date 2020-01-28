@@ -13,6 +13,7 @@ public class Main extends Application {
 
     public static Customer customerObject;
     public static int CUSTOMER_KEY;
+    public static int currentOrderID = 0;
 
     public static void viewMessage(String message, String title , Alert.AlertType alertType) {
         Alert alert = new Alert(alertType);
@@ -32,6 +33,7 @@ public class Main extends Application {
             Platform.exit();
             System.exit(0);
         });
+
 
     }
 
